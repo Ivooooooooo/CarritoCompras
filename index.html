@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+    <h1>Carrito de Compras</h1>
+
+    <div id="productos">
+        <div class="producto">
+            <span>Monitor - $200</span>
+            <button onclick="agregarProducto('Monitor', 200)">Agregar al carrito</button>
+        </div>
+        <div class="producto">
+            <span>Celular - $500</span>
+            <button onclick="agregarProducto('Celular', 500)">Agregar al carrito</button>
+        </div>
+        <div class="producto">
+            <span>Laptop - $800</span>
+            <button onclick="agregarProducto('Laptop', 800)">Agregar al carrito</button>
+        </div>
+    </div>
+
+    <h2>Carrito</h2>
+    <ul id="carrito">
+    </ul>
+
+    <label for="cuotas">Número de Cuotas:</label>
+    <input type="number" id="cuotas" min="1" value="1" onchange="calcularTotalEnCuotas()">
+
+    <p class="total">Total: $<span id="total">0</span></p>
+    <p class="total">Total en Cuotas (con interés): $<span id="totalCuotas">0</span></p>
+
+    <label for="codigoDescuento">Código de Descuento:</label>
+    <input type="text" id="codigoDescuento" placeholder="Ingresa tu código">
+    <button onclick="aplicarDescuento()">Aplicar</button>
+
+    <script src="./js/main.js"></script>
+</body>
+
+</html>
