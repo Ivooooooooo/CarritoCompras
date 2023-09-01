@@ -3,6 +3,8 @@ let total = 0;
 let limitePorProducto = {};
 let tasaInteres = 0.1;
 let descuentoAplicado = false;
+let codigoCoderUsado = false;
+let cuotasSeleccionadas = 1;
 
 function agregarProducto(nombre, precio) {
     if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
@@ -27,9 +29,16 @@ function eliminarProducto(index) {
 }
 
 function calcularTotalEnCuotas() {
-    const cuotas = parseInt(document.getElementById("cuotas").value);
+    const cuotas = cuotasSeleccionadas;
     const totalEnCuotas = calcularTotalConInteres(total, cuotas);
+    document.getElementById("total").textContent = total.toFixed(2);
+    document.getElementById("costoCuota").textContent = (totalEnCuotas / cuotas).toFixed(2);
     document.getElementById("totalCuotas").textContent = totalEnCuotas.toFixed(2);
+}
+
+function calcularCuotas() {
+    cuotasSeleccionadas = parseInt(document.getElementById("cuotas").value);
+    calcularTotalEnCuotas();
 }
 
 function calcularTotalConInteres(capitalInicial, periodos) {
@@ -37,10 +46,16 @@ function calcularTotalConInteres(capitalInicial, periodos) {
 }
 
 function aplicarDescuento() {
+    if (codigoCoderUsado) {
+        alert("El código CODER ya ha sido utilizado.");
+        return;
+    }
+
     const codigoDescuento = document.getElementById("codigoDescuento").value;
     if (codigoDescuento === "CODER" && !descuentoAplicado) {
         total *= 0.5;
         descuentoAplicado = true;
+        codigoCoderUsado = true;
         actualizarCarrito();
         alert("Descuento aplicado con éxito.");
     } else {
@@ -48,10 +63,16 @@ function aplicarDescuento() {
     }
 }
 
+function mostrarAlerta() {
+    if (codigoCoderUsado) {
+        alert("Aún no implementado.");
+    } else {
+        alert("Puedes utilizar el código CODER para obtener un 50% de descuento");
+    }
+}
+
 function actualizarCarrito() {
     const carritoElement = document.getElementById("carrito");
-    const totalElement = document.getElementById("total");
-
     carritoElement.innerHTML = "";
     carrito.forEach((producto, index) => {
         const li = document.createElement("li");
@@ -63,6 +84,11 @@ function actualizarCarrito() {
         carritoElement.appendChild(li);
     });
 
-    totalElement.textContent = total.toFixed(2);
     calcularTotalEnCuotas();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    actualizarCarrito();
+
+    document.getElementById("cuotas").onchange = calcularCuotas;
+});

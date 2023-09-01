@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <h1>Carrito de Compras</h1>
+    <h1 class="sepIzq sepAb">Carrito de Compras</h1>
 
     <div id="productos">
         <div class="producto">
@@ -26,19 +26,29 @@
         </div>
     </div>
 
-    <h2>Carrito</h2>
-    <ul id="carrito">
-    </ul>
+    <h2 class="sepIzq sepAb">Carrito</h2>
+    <ul class="sepIzq sepAb" id="carrito"></ul>
 
-    <label for="cuotas">Número de Cuotas:</label>
-    <input type="number" id="cuotas" min="1" value="1" onchange="calcularTotalEnCuotas()">
+    <label class="sepIzq sepAb" for="codigoDescuento">Código de Descuento:</label>
+    <input class="sepIzq sepAb" type="text" id="codigoDescuento" placeholder="Ingresa tu código">
+    <button class="sepIzq sepAb" onclick="aplicarDescuento()">Aplicar</button>
 
-    <p class="total">Total: $<span id="total">0</span></p>
-    <p class="total">Total en Cuotas (con interés): $<span id="totalCuotas">0</span></p>
+    <label class="sepIzq sepAb" for="cuotas">Número de Cuotas:</label>
+    <select class="sepIzq sepAb" id="cuotas" onchange="calcularCuotas()">
+        <option value="1">1 cuota</option>
+        <option value="2">2 cuotas</option>
+        <option value="3">3 cuotas</option>
+        <option value="4">4 cuotas</option>
+        <option value="5">5 cuotas</option>
+    </select>
 
-    <label for="codigoDescuento">Código de Descuento:</label>
-    <input type="text" id="codigoDescuento" placeholder="Ingresa tu código">
-    <button onclick="aplicarDescuento()">Aplicar</button>
+    <div class="sepIzq sepAb" id="cuotasInfo">
+        <p class="total">Total: $<span class="total" id="total">0</span></p>
+        <p class="total">Costo de cada cuota: $<span id="costoCuota">0</span></p>
+        <p class="total">Total de todas las cuotas: $<span id="totalCuotas">0</span></p>
+    </div>
+
+    <button class="sepIzq sepAb" id="botonPagar" onclick="mostrarAlerta()">PAGAR</button>
 
     <script src="./js/main.js"></script>
 </body>

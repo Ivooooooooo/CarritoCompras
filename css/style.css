@@ -1,94 +1,112 @@
 body {
+    background-color: #121212;
+    color: #fff;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
     padding: 0;
-}
-
-h1 {
-    text-align: center;
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    margin: 0;
 }
 
 .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.content {
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    text-align: center;
-    max-width: 600px;
-    width: 100%;
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 .producto {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    background-color: #212121;
+    border-radius: 4px;
     padding: 10px;
-    margin: 10px 0;
+    margin-bottom: 10px;
     display: flex;
     justify-content: space-between;
-    align-items: center;
 }
 
-button {
-    background-color: #007BFF;
+.producto span {
+    flex: 1;
+}
+
+.producto button {
+    background-color: #1976D2;
     color: #fff;
     border: none;
     padding: 5px 10px;
+    border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #0056b3;
-}
-
-h2 {
-    text-align: center;
-    margin-top: 20px;
-}
-
-ul {
-    list-style: none;
+#carrito {
+    list-style-type: none;
     padding: 0;
 }
 
-li {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin: 5px 0;
+#carrito li {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    padding: 5px 0;
+}
+
+#carrito button {
+    background-color: #D32F2F;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+}
+
+input[type="text"],
+select {
+    width: 100%;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #555;
+    background-color: #333;
+    color: #fff;
+}
+
+button {
+    background-color: #1976D2;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#botonPagar {
+    background-color: #388E3C;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#cuotasInfo {
+    background-color: #212121;
+    padding: 10px;
+    border-radius: 4px;
+    margin-top: 20px;
 }
 
 .total {
     font-weight: bold;
-    font-size: 24px;
-    padding: 10px;
 }
 
-label {
-    font-weight: bold;
-    padding: 10px;
+.sepIzq {
+    margin-left: 10px;
 }
 
-input {
-    width: 50px;
-}
-
-#totalCuotas {
-    font-size: 24px;
-    font-weight: bold;
-    color: #ff6600;
+.sepAb {
+    margin-bottom: 10px;
 }
