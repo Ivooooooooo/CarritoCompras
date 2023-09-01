@@ -110,3 +110,16 @@ button {
 .sepAb {
     margin-bottom: 10px;
 }
+
+.carritoRota {
+    animation: rotarCarrito 3s linear infinite;
+}
+
+@keyframes rotarCarrito {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
