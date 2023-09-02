@@ -1,31 +1,43 @@
-let carrito = [];
+let carrito = {};
 let total = 0;
-let limitePorProducto = {};
 let tasaInteres = 0.1;
 let descuentoAplicado = false;
 let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
+const limitePorProducto = {};
 
 function agregarProducto(nombre, precio) {
-    if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 2) {
-        carrito.push({
-            nombre,
-            precio
-        });
+    if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
+        if (carrito[nombre] === undefined) {
+            carrito[nombre] = {
+                cantidad: 1,
+                precio: precio,
+            };
+        } else {
+            carrito[nombre].cantidad++;
+        }
+
         total += precio;
         actualizarCarrito();
         limitePorProducto[nombre] = (limitePorProducto[nombre] || 0) + 1;
     } else {
-        alert(`¡Ya tienes 2 ${nombre} en tu carrito!`);
+        alert(`¡Ya tienes 3 ${nombre} en tu carrito!`);
     }
 }
 
-function eliminarProducto(index) {
-    const producto = carrito[index];
-    total -= producto.precio;
-    limitePorProducto[producto.nombre] -= 1;
-    carrito.splice(index, 1);
-    actualizarCarrito();
+function eliminarProducto(nombre) {
+    if (carrito[nombre] !== undefined) {
+        const precioPorProducto = carrito[nombre].precio;
+        total -= precioPorProducto;
+        carrito[nombre].cantidad--;
+
+        if (carrito[nombre].cantidad === 0) {
+            delete carrito[nombre];
+        }
+
+        actualizarCarrito();
+        limitePorProducto[nombre]--;
+    }
 }
 
 function calcularTotalEnCuotas() {
@@ -74,15 +86,17 @@ function mostrarAlerta() {
 function actualizarCarrito() {
     const carritoElement = document.getElementById("carrito");
     carritoElement.innerHTML = "";
-    carrito.forEach((producto, index) => {
+
+    for (const nombreProducto in carrito) {
+        const producto = carrito[nombreProducto];
         const li = document.createElement("li");
-        li.textContent = `${producto.nombre} - $${producto.precio}`;
+        li.textContent = `${nombreProducto} x${producto.cantidad} - $${producto.precio * producto.cantidad}`;
         const eliminarButton = document.createElement("button");
         eliminarButton.textContent = "Eliminar";
-        eliminarButton.onclick = () => eliminarProducto(index);
+        eliminarButton.onclick = () => eliminarProducto(nombreProducto);
         li.appendChild(eliminarButton);
         carritoElement.appendChild(li);
-    });
+    }
 
     calcularTotalEnCuotas();
 }
