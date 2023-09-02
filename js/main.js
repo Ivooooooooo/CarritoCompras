@@ -1,6 +1,7 @@
 let carrito = {};
 let total = 0;
-let tasaInteres = 0.1;
+let tasaInteresInicial = 0.1;
+let tasaInteresFinal = 0.15;
 let descuentoAplicado = false;
 let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
@@ -54,7 +55,12 @@ function calcularCuotas() {
 }
 
 function calcularTotalConInteres(capitalInicial, periodos) {
+    let tasaInteres = calcularTasaInteres(periodos);
     return capitalInicial * Math.pow(1 + tasaInteres, periodos);
+}
+
+function calcularTasaInteres(periodos) {
+    return tasaInteresInicial + (periodos - 1) * ((tasaInteresFinal - tasaInteresInicial) / 4);
 }
 
 function aplicarDescuento() {
