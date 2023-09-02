@@ -121,8 +121,6 @@ const cargarCarritoDesdeJSON = () => {
         actualizarCarrito();
     }
 };
-
-
 */
 
 document.addEventListener("DOMContentLoaded", () => {

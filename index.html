@@ -8,6 +8,8 @@
 
     <title>Carrito de Compras</title>
     <link rel="stylesheet" href="./css/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -52,14 +54,7 @@
         <p class="total">Costo por cuota: $<span id="costoCuota">0</span></p>
         <p class="total">Total: $<span id="totalCuotas">0</span></p>
     </div>
-
-    <div class="sepIzq sepAb">
-        <h3>Elige tu método de pago:</h3>
-        <img src="./images/paypal.png" alt="PayPal" width="100" height="50">
-        <img src="./images/applepay.png" alt="Apple Pay" width="100" height="50">
-        <img src="./images/googlepay.png" alt="Google Pay" width="100" height="50">
-    </div>
-
+    
     <button class="sepIzq sepAb" id="botonPagar" onclick="mostrarAlerta()">PAGAR</button>
 
     <script src="./js/main.js"></script>
