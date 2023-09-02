@@ -7,7 +7,7 @@ let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
 
 function agregarProducto(nombre, precio) {
-    if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
+    if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 2) {
         carrito.push({
             nombre,
             precio
@@ -16,7 +16,7 @@ function agregarProducto(nombre, precio) {
         actualizarCarrito();
         limitePorProducto[nombre] = (limitePorProducto[nombre] || 0) + 1;
     } else {
-        alert(`¡Ya tienes 3 ${nombre} en tu carrito!`);
+        alert(`¡Ya tienes 2 ${nombre} en tu carrito!`);
     }
 }
 
