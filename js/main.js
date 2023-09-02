@@ -7,7 +7,7 @@ let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
 const limitePorProducto = {};
 
-function agregarProducto(nombre, precio) {
+const agregarProducto = (nombre, precio) => {
     if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
         if (carrito[nombre] === undefined) {
             carrito[nombre] = {
@@ -24,9 +24,9 @@ function agregarProducto(nombre, precio) {
     } else {
         alert(`¡Ya tienes 3 ${nombre} en tu carrito!`);
     }
-}
+};
 
-function eliminarProducto(nombre) {
+const eliminarProducto = (nombre) => {
     if (carrito[nombre] !== undefined) {
         const precioPorProducto = carrito[nombre].precio;
         total -= precioPorProducto;
@@ -39,31 +39,31 @@ function eliminarProducto(nombre) {
         actualizarCarrito();
         limitePorProducto[nombre]--;
     }
-}
+};
 
-function calcularTotalEnCuotas() {
+const calcularTotalEnCuotas = () => {
     const cuotas = cuotasSeleccionadas;
     const totalEnCuotas = calcularTotalConInteres(total, cuotas);
     document.getElementById("total").textContent = total.toFixed(2);
     document.getElementById("costoCuota").textContent = (totalEnCuotas / cuotas).toFixed(2);
     document.getElementById("totalCuotas").textContent = totalEnCuotas.toFixed(2);
-}
+};
 
-function calcularCuotas() {
+const calcularCuotas = () => {
     cuotasSeleccionadas = parseInt(document.getElementById("cuotas").value);
     calcularTotalEnCuotas();
-}
+};
 
-function calcularTotalConInteres(capitalInicial, periodos) {
+const calcularTotalConInteres = (capitalInicial, periodos) => {
     let tasaInteres = calcularTasaInteres(periodos);
     return capitalInicial * Math.pow(1 + tasaInteres, periodos);
-}
+};
 
-function calcularTasaInteres(periodos) {
+const calcularTasaInteres = (periodos) => {
     return tasaInteresInicial + (periodos - 1) * ((tasaInteresFinal - tasaInteresInicial) / 4);
-}
+};
 
-function aplicarDescuento() {
+const aplicarDescuento = () => {
     if (codigoCoderUsado) {
         alert("El código CODER ya ha sido utilizado.");
         return;
@@ -79,17 +79,17 @@ function aplicarDescuento() {
     } else {
         alert("Código de descuento no válido o ya aplicado.");
     }
-}
+};
 
-function mostrarAlerta() {
+const mostrarAlerta = () => {
     if (codigoCoderUsado) {
         alert("Aún no implementado.");
     } else {
         alert("Puedes utilizar el código CODER para obtener un 50% de descuento");
     }
-}
+};
 
-function actualizarCarrito() {
+const actualizarCarrito = () => {
     const carritoElement = document.getElementById("carrito");
     carritoElement.innerHTML = "";
 
@@ -105,10 +105,30 @@ function actualizarCarrito() {
     }
 
     calcularTotalEnCuotas();
-}
+
+    //guardarCarritoEnJSON();
+};
+
+/*
+const guardarCarritoEnJSON = () => {
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+};
+
+const cargarCarritoDesdeJSON = () => {
+    const carritoGuardado = localStorage.getItem("carrito");
+    if (carritoGuardado) {
+        carrito = JSON.parse(carritoGuardado);
+        actualizarCarrito();
+    }
+};
+
+
+*/
 
 document.addEventListener("DOMContentLoaded", () => {
     actualizarCarrito();
 
     document.getElementById("cuotas").onchange = calcularCuotas;
+
+    //cargarCarritoDesdeJSON();
 });
