@@ -1,4 +1,4 @@
-let carrito = {};
+let carrito = [];
 let total = 0;
 let tasaInteresInicial = 0.1;
 let tasaInteresFinal = 0.15;
@@ -7,15 +7,23 @@ let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
 const limitePorProducto = {};
 
+class Producto {
+    constructor(nombre, precio) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.cantidad = 1;
+    }
+}
+
 const agregarProducto = (nombre, precio) => {
     if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
-        if (carrito[nombre] === undefined) {
-            carrito[nombre] = {
-                cantidad: 1,
-                precio: precio,
-            };
+        const productoExistente = carrito.find((producto) => producto.nombre === nombre);
+
+        if (productoExistente) {
+            productoExistente.cantidad++;
         } else {
-            carrito[nombre].cantidad++;
+            const nuevoProducto = new Producto(nombre, precio);
+            carrito.push(nuevoProducto);
         }
 
         total += precio;
@@ -24,21 +32,33 @@ const agregarProducto = (nombre, precio) => {
     } else {
         alert(`¡Ya tienes 3 ${nombre} en tu carrito!`);
     }
+    console.log("Producto agregado:", nombre, "Precio:", precio, "Carrito:", carrito, "Total:", total);
 };
 
 const eliminarProducto = (nombre) => {
-    if (carrito[nombre] !== undefined) {
-        const precioPorProducto = carrito[nombre].precio;
-        total -= precioPorProducto;
-        carrito[nombre].cantidad--;
+    const productoIndex = carrito.findIndex((producto) => producto.nombre === nombre);
 
-        if (carrito[nombre].cantidad === 0) {
-            delete carrito[nombre];
+    if (productoIndex !== -1) {
+        const precioPorProducto = carrito[productoIndex].precio;
+        total -= precioPorProducto;
+        carrito[productoIndex].cantidad--;
+
+        if (carrito[productoIndex].cantidad === 0) {
+            carrito.splice(productoIndex, 1);
         }
 
         actualizarCarrito();
         limitePorProducto[nombre]--;
     }
+    console.log("Producto eliminado:", nombre, "Carrito:", carrito, "Total:", total);
+};
+
+const buscarProducto = (nombre) => {
+    return carrito.find((producto) => producto.nombre === nombre);
+};
+
+const filtrarProductosConDescuento = () => {
+    return carrito.filter((producto) => producto.descuento);
 };
 
 const calcularTotalEnCuotas = () => {
@@ -51,7 +71,13 @@ const calcularTotalEnCuotas = () => {
 
 const calcularCuotas = () => {
     cuotasSeleccionadas = parseInt(document.getElementById("cuotas").value);
-    calcularTotalEnCuotas();
+    if (!isNaN(cuotasSeleccionadas) && cuotasSeleccionadas > 0) {
+        calcularTotalEnCuotas();
+    } else {
+        alert("Por favor, ingrese un número válido de cuotas.");
+    }
+
+    console.log("Cuotas seleccionadas:", cuotasSeleccionadas);
 };
 
 const calcularTotalConInteres = (capitalInicial, periodos) => {
@@ -73,12 +99,20 @@ const aplicarDescuento = () => {
     if (codigoDescuento === "CODER" && !descuentoAplicado) {
         total *= 0.5;
         descuentoAplicado = true;
-        codigoCoderUsado = true;
+
+        carrito.forEach((producto) => {
+            if (producto.nombre.includes("descuento")) { /* sin implementar */
+                producto.descuento = true;
+            }
+        });
+
         actualizarCarrito();
         alert("Descuento aplicado con éxito.");
     } else {
         alert("Código de descuento no válido o ya aplicado.");
     }
+
+    console.log("Código de descuento:", codigoDescuento, "Descuento aplicado:", descuentoAplicado, "Total:", total);
 };
 
 const mostrarAlerta = () => {
@@ -93,40 +127,25 @@ const actualizarCarrito = () => {
     const carritoElement = document.getElementById("carrito");
     carritoElement.innerHTML = "";
 
-    for (const nombreProducto in carrito) {
-        const producto = carrito[nombreProducto];
+    carrito.forEach((producto) => {
         const li = document.createElement("li");
-        li.textContent = `${nombreProducto} x${producto.cantidad} - $${producto.precio * producto.cantidad}`;
+        li.textContent = `${producto.nombre} x${producto.cantidad} - $${producto.precio * producto.cantidad}`;
         const eliminarButton = document.createElement("button");
         eliminarButton.textContent = "Eliminar";
-        eliminarButton.onclick = () => eliminarProducto(nombreProducto);
+        eliminarButton.onclick = () => eliminarProducto(producto.nombre);
         li.appendChild(eliminarButton);
         carritoElement.appendChild(li);
-    }
+    });
 
     calcularTotalEnCuotas();
 
-    //guardarCarritoEnJSON();
+    console.log("Carrito actualizado:", carrito, "Total:", total);
 };
-
-/*
-const guardarCarritoEnJSON = () => {
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-};
-
-const cargarCarritoDesdeJSON = () => {
-    const carritoGuardado = localStorage.getItem("carrito");
-    if (carritoGuardado) {
-        carrito = JSON.parse(carritoGuardado);
-        actualizarCarrito();
-    }
-};
-*/
 
 document.addEventListener("DOMContentLoaded", () => {
     actualizarCarrito();
 
     document.getElementById("cuotas").onchange = calcularCuotas;
 
-    //cargarCarritoDesdeJSON();
+    console.log("Página cargada y carrito actualizado.");
 });
