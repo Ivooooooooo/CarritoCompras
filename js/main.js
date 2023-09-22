@@ -7,6 +7,10 @@ let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
 const limitePorProducto = {};
 
+const mostrarMensaje = (mensaje, tipo) => {
+    Swal.fire(mensaje, "", tipo);
+};
+
 class Producto {
     constructor(nombre, precio) {
         this.nombre = nombre;
@@ -30,7 +34,7 @@ const agregarProducto = (nombre, precio) => {
         actualizarCarrito();
         limitePorProducto[nombre] = (limitePorProducto[nombre] || 0) + 1;
     } else {
-        alert(`¡Ya tienes 3 ${nombre} en tu carrito!`);
+        mostrarMensaje("¡Ya tienes 3 productos en tu carrito!", "warning");
     }
     console.log("Producto agregado:", nombre, "Precio:", precio, "Carrito:", carrito, "Total:", total);
 };
@@ -74,7 +78,7 @@ const calcularCuotas = () => {
     if (!isNaN(cuotasSeleccionadas) && cuotasSeleccionadas > 0) {
         calcularTotalEnCuotas();
     } else {
-        alert("Por favor, ingrese un número válido de cuotas.");
+        mostrarMensaje("Por favor, ingrese un número válido de cuotas.", "error");
     }
 
     console.log("Cuotas seleccionadas:", cuotasSeleccionadas);
@@ -91,7 +95,7 @@ const calcularTasaInteres = (periodos) => {
 
 const aplicarDescuento = () => {
     if (codigoCoderUsado) {
-        alert("El código CODER ya ha sido utilizado.");
+        mostrarMensaje("El código CODER ya ha sido utilizado.", "error");
         return;
     }
 
@@ -101,15 +105,19 @@ const aplicarDescuento = () => {
         descuentoAplicado = true;
 
         carrito.forEach((producto) => {
-            if (producto.nombre.includes("descuento")) { /* sin implementar */
+            if (producto.nombre.includes("descuento")) {
+                /* sin implementar */
                 producto.descuento = true;
             }
         });
 
         actualizarCarrito();
-        alert("Descuento aplicado con éxito.");
+        mostrarMensaje("Descuento aplicado con éxito.", "success");
     } else {
-        alert("Código de descuento no válido o ya aplicado.");
+        const mensaje = codigoDescuento !== "CODER" ? "Código de descuento no válido." : "El descuento ya ha sido aplicado.";
+        if (mensaje) {
+            mostrarMensaje(mensaje, "error");
+        }
     }
 
     console.log("Código de descuento:", codigoDescuento, "Descuento aplicado:", descuentoAplicado, "Total:", total);
@@ -117,9 +125,9 @@ const aplicarDescuento = () => {
 
 const mostrarAlerta = () => {
     if (codigoCoderUsado) {
-        alert("Aún no implementado.");
+        mostrarMensaje("Aún no implementado.", "info");
     } else {
-        alert("Puedes utilizar el código CODER para obtener un 50% de descuento");
+        mostrarMensaje("Puedes utilizar el código CODER para obtener un 50% de descuento", "info");
     }
 };
 
