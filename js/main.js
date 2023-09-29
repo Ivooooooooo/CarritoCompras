@@ -1,34 +1,90 @@
-let carrito = [];
+const elementos = {
+    botonAgregarMonitor: document.getElementById("agregarMonitor"),
+    botonAgregarCelular: document.getElementById("agregarCelular"),
+    botonAgregarLaptop: document.getElementById("agregarLaptop"),
+    detallesProducto: document.getElementById("detallesProducto"),
+    nombreProducto: document.getElementById("nombreProducto"),
+    precioProducto: document.getElementById("precioProducto"),
+    descripcionProducto: document.getElementById("descripcionProducto"),
+    carritoElement: document.getElementById("carrito"),
+    detallesProductosContainer: document.getElementById("detallesProductosContainer"),
+    cuotasInput: document.getElementById("cuotas"),
+    codigoDescuentoInput: document.getElementById("codigoDescuento"),
+    totalElement: document.getElementById("total"),
+    costoCuotaElement: document.getElementById("costoCuota"),
+    totalCuotasElement: document.getElementById("totalCuotas"),
+};
+
+const carrito = [];
+const productosAgregados = {};
+const cantidadPorProducto = {};
 let total = 0;
 let tasaInteresInicial = 0.1;
 let tasaInteresFinal = 0.15;
 let descuentoAplicado = false;
-let codigoCoderUsado = false;
 let cuotasSeleccionadas = 1;
 const limitePorProducto = {};
+
+const imagenesProductos = {
+    Monitor: './images/monitor.png',
+    Celular: './images/celular.png',
+    Laptop: './images/laptop.png'
+};
+
+class Producto {
+    constructor(nombre, precio, descripcion) {
+        this.nombre = nombre;
+        this.precio = precio;
+        this.descripcion = descripcion;
+        this.cantidad = 1;
+    }
+}
 
 const mostrarMensaje = (mensaje, tipo) => {
     Swal.fire(mensaje, "", tipo);
 };
 
-class Producto {
-    constructor(nombre, precio) {
-        this.nombre = nombre;
-        this.precio = precio;
-        this.cantidad = 1;
+const crearElementoHTML = (tipo, atributos = {}, contenido = "") => {
+    const elemento = document.createElement(tipo);
+    for (const atributo in atributos) {
+        elemento.setAttribute(atributo, atributos[atributo]);
     }
-}
+    elemento.innerHTML = contenido;
+    return elemento;
+};
 
-const agregarProducto = (nombre, precio) => {
+const eliminarDescripcionProducto = (nombre) => {
+    const detallesProductosContainer = elementos.detallesProductosContainer;
+    const detalleProductos = detallesProductosContainer.getElementsByClassName("detalleProducto");
+
+    for (let i = 0; i < detalleProductos.length; i++) {
+        const detalleProducto = detalleProductos[i];
+        const nombreProductoDetalle = detalleProducto.querySelector("h3").textContent;
+
+        if (nombreProductoDetalle === nombre) {
+            detallesProductosContainer.removeChild(detalleProducto);
+            delete productosAgregados[nombre];
+            break;
+        }
+    }
+
+    if (Object.keys(productosAgregados).length === 0) {
+        detallesProductosContainer.style.display = "none";
+    }
+};
+
+const agregarProductoAlCarrito = (nombre, precio, descripcion) => {
     if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
         const productoExistente = carrito.find((producto) => producto.nombre === nombre);
 
         if (productoExistente) {
             productoExistente.cantidad++;
         } else {
-            const nuevoProducto = new Producto(nombre, precio);
+            const nuevoProducto = new Producto(nombre, precio, descripcion);
             carrito.push(nuevoProducto);
         }
+
+        cantidadPorProducto[nombre] = (cantidadPorProducto[nombre] || 0) + 1;
 
         total += precio;
         actualizarCarrito();
@@ -36,10 +92,10 @@ const agregarProducto = (nombre, precio) => {
     } else {
         mostrarMensaje("¡Ya tienes 3 productos en tu carrito!", "warning");
     }
-    console.log("Producto agregado:", nombre, "Precio:", precio, "Carrito:", carrito, "Total:", total);
+    console.log("Producto agregado:", nombre, "Precio:", precio, "Descripción:", descripcion, "Carrito:", carrito, "Total:", total);
 };
 
-const eliminarProducto = (nombre) => {
+const eliminarProductoDelCarrito = (nombre) => {
     const productoIndex = carrito.findIndex((producto) => producto.nombre === nombre);
 
     if (productoIndex !== -1) {
@@ -47,8 +103,14 @@ const eliminarProducto = (nombre) => {
         total -= precioPorProducto;
         carrito[productoIndex].cantidad--;
 
+        cantidadPorProducto[nombre]--;
+
         if (carrito[productoIndex].cantidad === 0) {
             carrito.splice(productoIndex, 1);
+        }
+
+        if (cantidadPorProducto[nombre] === 0) {
+            eliminarDescripcionProducto(nombre);
         }
 
         actualizarCarrito();
@@ -57,7 +119,7 @@ const eliminarProducto = (nombre) => {
     console.log("Producto eliminado:", nombre, "Carrito:", carrito, "Total:", total);
 };
 
-const buscarProducto = (nombre) => {
+const buscarProductoEnCarrito = (nombre) => {
     return carrito.find((producto) => producto.nombre === nombre);
 };
 
@@ -68,17 +130,20 @@ const filtrarProductosConDescuento = () => {
 const calcularTotalEnCuotas = () => {
     const cuotas = cuotasSeleccionadas;
     const totalEnCuotas = calcularTotalConInteres(total, cuotas);
-    document.getElementById("total").textContent = total.toFixed(2);
-    document.getElementById("costoCuota").textContent = (totalEnCuotas / cuotas).toFixed(2);
-    document.getElementById("totalCuotas").textContent = totalEnCuotas.toFixed(2);
+    elementos.totalElement.textContent = total.toFixed(2);
+    elementos.costoCuotaElement.textContent = (totalEnCuotas / cuotas).toFixed(2);
+    elementos.totalCuotasElement.textContent = totalEnCuotas.toFixed(2);
 };
 
 const calcularCuotas = () => {
-    cuotasSeleccionadas = parseInt(document.getElementById("cuotas").value);
-    if (!isNaN(cuotasSeleccionadas) && cuotasSeleccionadas > 0) {
+    const cuotasValue = parseInt(elementos.cuotasInput.value);
+
+    if (!isNaN(cuotasValue) && cuotasValue > 0) {
+        cuotasSeleccionadas = cuotasValue;
         calcularTotalEnCuotas();
     } else {
         mostrarMensaje("Por favor, ingrese un número válido de cuotas.", "error");
+        elementos.cuotasInput.value = cuotasSeleccionadas;
     }
 
     console.log("Cuotas seleccionadas:", cuotasSeleccionadas);
@@ -94,55 +159,91 @@ const calcularTasaInteres = (periodos) => {
 };
 
 const aplicarDescuento = () => {
-    if (codigoCoderUsado) {
+    if (descuentoAplicado) {
         mostrarMensaje("El código CODER ya ha sido utilizado.", "error");
         return;
     }
 
-    const codigoDescuento = document.getElementById("codigoDescuento").value;
-    if (codigoDescuento === "CODER" && !descuentoAplicado) {
-        total *= 0.5;
-        descuentoAplicado = true;
+    const codigoDescuento = elementos.codigoDescuentoInput.value;
+    const mensaje = validarCodigoDescuento(codigoDescuento);
 
-        carrito.forEach((producto) => {
-            if (producto.nombre.includes("descuento")) {
-                /* sin implementar */
-                producto.descuento = true;
-            }
-        });
-
-        actualizarCarrito();
-        mostrarMensaje("Descuento aplicado con éxito.", "success");
-    } else {
-        const mensaje = codigoDescuento !== "CODER" ? "Código de descuento no válido." : "El descuento ya ha sido aplicado.";
-        if (mensaje) {
-            mostrarMensaje(mensaje, "error");
-        }
+    if (mensaje) {
+        mostrarMensaje(mensaje, "error");
+        return;
     }
 
-    console.log("Código de descuento:", codigoDescuento, "Descuento aplicado:", descuentoAplicado, "Total:", total);
+    total *= 0.5;
+    descuentoAplicado = true;
+
+    carrito.forEach((producto) => {
+        if (producto.nombre.includes("descuento")) {
+            producto.descuento = true;
+        }
+    });
+
+    actualizarCarrito();
+    mostrarMensaje("Descuento aplicado con éxito.", "success");
+
+    console.log("Código de descuento aplicado:", codigoDescuento, "Descuento aplicado:", descuentoAplicado, "Total:", total);
+};
+
+const validarCodigoDescuento = (codigoDescuento) => {
+    if (codigoDescuento === "CODER") {
+        if (descuentoAplicado) {
+            return "El descuento ya ha sido aplicado.";
+        }
+        return null;
+    }
+    return "Código de descuento no válido.";
 };
 
 const mostrarAlerta = () => {
-    if (codigoCoderUsado) {
+    if (descuentoAplicado) {
         mostrarMensaje("Aún no implementado.", "info");
+
+        window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
     } else {
         mostrarMensaje("Puedes utilizar el código CODER para obtener un 50% de descuento", "info");
     }
 };
 
 const actualizarCarrito = () => {
-    const carritoElement = document.getElementById("carrito");
+    const carritoElement = elementos.carritoElement;
     carritoElement.innerHTML = "";
 
+    const detallesProductosContainer = elementos.detallesProductosContainer;
+    detallesProductosContainer.innerHTML = "";
+
     carrito.forEach((producto) => {
-        const li = document.createElement("li");
-        li.textContent = `${producto.nombre} x${producto.cantidad} - $${producto.precio * producto.cantidad}`;
-        const eliminarButton = document.createElement("button");
-        eliminarButton.textContent = "Eliminar";
-        eliminarButton.onclick = () => eliminarProducto(producto.nombre);
-        li.appendChild(eliminarButton);
-        carritoElement.appendChild(li);
+        // Detalles
+        const detalleProducto = crearElementoHTML("div", {
+            class: "detalleProducto"
+        });
+        detalleProducto.style.width = "332px";
+        detalleProducto.style.height = "198px";
+        detalleProducto.innerHTML = `
+            <h3>${producto.nombre} x${producto.cantidad}</h3>
+            <p>Precio total: $${producto.precio * producto.cantidad}</p>
+            <p>Descripción: ${producto.descripcion}</p>
+        `;
+        detallesProductosContainer.appendChild(detalleProducto);
+        detallesProductosContainer.style.display = "flex";
+
+        if (imagenesProductos[producto.nombre]) {
+            const imagenProducto = crearElementoHTML("img", {
+                class: "imagenProducto",
+                src: imagenesProductos[producto.nombre],
+                alt: producto.nombre
+            });
+            detalleProducto.appendChild(imagenProducto);
+        }
+
+        // Eliminar
+        const botonEliminar = crearElementoHTML("button", {
+            class: "botonEliminar"
+        }, "Eliminar");
+        botonEliminar.onclick = () => eliminarProductoDelCarrito(producto.nombre);
+        detallesProductosContainer.appendChild(botonEliminar);
     });
 
     calcularTotalEnCuotas();
@@ -150,10 +251,22 @@ const actualizarCarrito = () => {
     console.log("Carrito actualizado:", carrito, "Total:", total);
 };
 
+elementos.botonAgregarMonitor.addEventListener("click", () => {
+    agregarProductoAlCarrito('Monitor', 200, 'Monitor de 19 pulgadas, ideal para tareas de oficina.');
+});
+
+elementos.botonAgregarCelular.addEventListener("click", () => {
+    agregarProductoAlCarrito('Celular', 500, 'Teléfono celular de última generación con cámara de alta resolución.');
+});
+
+elementos.botonAgregarLaptop.addEventListener("click", () => {
+    agregarProductoAlCarrito('Laptop', 800, 'Laptop potente para juegos con pantalla Full HD.');
+});
+
 document.addEventListener("DOMContentLoaded", () => {
     actualizarCarrito();
 
-    document.getElementById("cuotas").onchange = calcularCuotas;
+    elementos.cuotasInput.onchange = calcularCuotas;
 
     console.log("Página cargada y carrito actualizado.");
 });

@@ -83,6 +83,22 @@ button {
     cursor: pointer;
 }
 
+.botonEliminar {
+    width: 140px;
+    height: 30px;
+    background-color: red;
+    color: white;
+    margin-right: 20px;
+    margin-left: 20px;
+}
+
+.imagenProducto {
+    max-width: 140px;
+    max-height: 50px;
+    margin-bottom: 50px;
+    border: 2px solid white;
+}
+
 #botonPagar {
     background-color: #388E3C;
     color: #fff;
@@ -119,6 +135,7 @@ button {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }

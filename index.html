@@ -21,20 +21,22 @@
     <div id="productos">
         <div class="producto">
             <span>Monitor - $200</span>
-            <button onclick="agregarProducto('Monitor', 200)">Agregar al carrito</button>
+            <button id="agregarMonitor">Agregar al carrito</button>
         </div>
         <div class="producto">
             <span>Celular - $500</span>
-            <button onclick="agregarProducto('Celular', 500)">Agregar al carrito</button>
+            <button id="agregarCelular">Agregar al carrito</button>
         </div>
         <div class="producto">
             <span>Laptop - $800</span>
-            <button onclick="agregarProducto('Laptop', 800)">Agregar al carrito</button>
+            <button id="agregarLaptop">Agregar al carrito</button>
         </div>
     </div>
 
     <h2 class="sepIzq sepAb">Carrito</h2>
-    <ul class="sepIzq sepAb" id="carrito"></ul>
+    <ul class="sepIzq sepAb" id="carrito"> </ul>
+
+    <div class="sepIzq detalleProducto" id="detallesProductosContainer"> </div>
 
     <label class="sepIzq sepAb" for="codigoDescuento">Código de Descuento:</label>
     <input class="sepIzq sepAb" type="text" id="codigoDescuento" placeholder="Ingresa tu código">
