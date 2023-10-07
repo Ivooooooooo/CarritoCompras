@@ -44,6 +44,28 @@ const mostrarMensaje = (mensaje, tipo) => {
     Swal.fire(mensaje, "", tipo);
 };
 
+const guardarCarritoEnLocalStorage = () => {
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+};
+
+const guardarMontoTotalEnLocalStorage = () => {
+    localStorage.setItem('montoTotal', total.toString());
+};
+
+const cargarCarritoDesdeLocalStorage = () => {
+    const carritoGuardado = localStorage.getItem('carrito');
+    if (carritoGuardado) {
+        carrito.push(...JSON.parse(carritoGuardado));
+    }
+};
+
+const cargarMontoTotalDesdeLocalStorage = () => {
+    const montoTotalGuardado = localStorage.getItem('montoTotal');
+    if (montoTotalGuardado) {
+        total = parseFloat(montoTotalGuardado);
+    }
+};
+
 const crearElementoHTML = (tipo, atributos = {}, contenido = "") => {
     const elemento = document.createElement(tipo);
     for (const atributo in atributos) {
@@ -73,26 +95,46 @@ const eliminarDescripcionProducto = (nombre) => {
     }
 };
 
-const agregarProductoAlCarrito = (nombre, precio, descripcion) => {
-    if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
-        const productoExistente = carrito.find((producto) => producto.nombre === nombre);
-
-        if (productoExistente) {
-            productoExistente.cantidad++;
-        } else {
-            const nuevoProducto = new Producto(nombre, precio, descripcion);
-            carrito.push(nuevoProducto);
+const verificarLimitePorTipo = (nombre) => {
+    const cantidadEnCarrito = carrito.reduce((total, producto) => {
+        if (producto.nombre === nombre) {
+            total += producto.cantidad;
         }
+        return total;
+    }, 0);
 
-        cantidadPorProducto[nombre] = (cantidadPorProducto[nombre] || 0) + 1;
+    return cantidadEnCarrito < 3;
+};
 
-        total += precio;
-        actualizarCarrito();
-        limitePorProducto[nombre] = (limitePorProducto[nombre] || 0) + 1;
+const agregarProductoAlCarrito = (nombre, precio, descripcion) => {
+    if (verificarLimitePorTipo(nombre)) {
+        if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
+            const productoExistente = carrito.find((producto) => producto.nombre === nombre);
+
+            if (productoExistente) {
+                productoExistente.cantidad++;
+            } else {
+                const nuevoProducto = new Producto(nombre, precio, descripcion);
+                carrito.push(nuevoProducto);
+            }
+
+            cantidadPorProducto[nombre] = (cantidadPorProducto[nombre] || 0) + 1;
+
+            total += precio;
+            actualizarCarrito();
+            limitePorProducto[nombre] = (limitePorProducto[nombre] || 0) + 1;
+
+            guardarCarritoEnLocalStorage();
+        } else {
+            mostrarMensaje(`¡Ya tienes 3 productos de tipo "${nombre}" en tu carrito!`, "warning");
+        }
     } else {
-        mostrarMensaje("¡Ya tienes 3 productos en tu carrito!", "warning");
+        mostrarMensaje(`¡Ya tienes 3 productos de tipo "${nombre}" en tu carrito!`, "warning");
     }
+
     console.log("Producto agregado:", nombre, "Precio:", precio, "Descripción:", descripcion, "Carrito:", carrito, "Total:", total);
+
+    guardarMontoTotalEnLocalStorage();
 };
 
 const eliminarProductoDelCarrito = (nombre) => {
@@ -117,6 +159,9 @@ const eliminarProductoDelCarrito = (nombre) => {
         limitePorProducto[nombre]--;
     }
     console.log("Producto eliminado:", nombre, "Carrito:", carrito, "Total:", total);
+
+    guardarCarritoEnLocalStorage();
+    guardarMontoTotalEnLocalStorage();
 };
 
 const buscarProductoEnCarrito = (nombre) => {
@@ -164,7 +209,17 @@ const aplicarDescuento = () => {
         return;
     }
 
-    const codigoDescuento = elementos.codigoDescuentoInput.value;
+    const codigoDescuento = elementos.codigoDescuentoInput.value.trim();
+    if (codigoDescuento === "") {
+        mostrarMensaje("Por favor, ingrese un código de descuento válido.", "error");
+        return;
+    }
+
+    if (carrito.length === 0) {
+        mostrarMensaje("No hay productos en el carrito para aplicar el descuento.", "error");
+        return;
+    }
+
     const mensaje = validarCodigoDescuento(codigoDescuento);
 
     if (mensaje) {
@@ -188,13 +243,7 @@ const aplicarDescuento = () => {
 };
 
 const validarCodigoDescuento = (codigoDescuento) => {
-    if (codigoDescuento === "CODER") {
-        if (descuentoAplicado) {
-            return "El descuento ya ha sido aplicado.";
-        }
-        return null;
-    }
-    return "Código de descuento no válido.";
+    return codigoDescuento === "CODER" ? (descuentoAplicado ? "El descuento ya ha sido aplicado." : null) : "Código de descuento no válido";
 };
 
 const mostrarAlerta = () => {
@@ -251,22 +300,68 @@ const actualizarCarrito = () => {
     console.log("Carrito actualizado:", carrito, "Total:", total);
 };
 
-elementos.botonAgregarMonitor.addEventListener("click", () => {
-    agregarProductoAlCarrito('Monitor', 200, 'Monitor de 19 pulgadas, ideal para tareas de oficina.');
-});
+elementos.botonAgregarMonitor.addEventListener("click", () => agregarProductoAlCarrito('Monitor', 200, 'Monitor de 19 pulgadas, ideal para tareas de oficina.'));
+elementos.botonAgregarCelular.addEventListener("click", () => agregarProductoAlCarrito('Celular', 500, 'Teléfono celular de última generación con cámara de alta resolución.'));
+elementos.botonAgregarLaptop.addEventListener("click", () => agregarProductoAlCarrito('Laptop', 800, 'Laptop potente para juegos con pantalla Full HD.'));
 
-elementos.botonAgregarCelular.addEventListener("click", () => {
-    agregarProductoAlCarrito('Celular', 500, 'Teléfono celular de última generación con cámara de alta resolución.');
-});
+const activarBotonEliminarLocalStorage = (mostrar) => {
+    const botonEliminarLocalStorage = document.getElementById("botonEliminarLocalStorage");
+    if (mostrar) {
+        botonEliminarLocalStorage.style.display = "block";
+    } else {
+        botonEliminarLocalStorage.style.display = "none";
+    }
+};
 
-elementos.botonAgregarLaptop.addEventListener("click", () => {
-    agregarProductoAlCarrito('Laptop', 800, 'Laptop potente para juegos con pantalla Full HD.');
-});
+const boolModoDebug = () => {
+    const checkboxDebug = document.getElementById("checkboxDebug");
+    if (checkboxDebug.checked) {
+        activarBotonEliminarLocalStorage(true);
+    } else {
+        activarBotonEliminarLocalStorage(false);
+    }
+};
+
+const eliminarLocalStorage = () => {
+    localStorage.clear();
+    mostrarMensaje("LocalStorage limpiado correctamente.", "success");
+
+    setTimeout(() => {
+        location.reload();
+    }, 1500);
+};
 
 document.addEventListener("DOMContentLoaded", () => {
+    cargarCarritoDesdeLocalStorage();
+    cargarMontoTotalDesdeLocalStorage();
     actualizarCarrito();
 
+    carrito.forEach((producto) => {
+        limitePorProducto[producto.nombre] = (limitePorProducto[producto.nombre] || 0) + 1;
+    });
+
     elementos.cuotasInput.onchange = calcularCuotas;
+
+    const labelCheckboxDebug = crearElementoHTML("label", {
+        for: "checkboxDebug"
+    }, "Activar Debug");
+    document.body.appendChild(labelCheckboxDebug);
+
+    const checkboxDebug = crearElementoHTML("input", {
+        type: "checkbox",
+        id: "checkboxDebug",
+        class: "checkboxDebug"
+    });
+    checkboxDebug.addEventListener("change", boolModoDebug);
+    document.body.appendChild(checkboxDebug);
+
+    const botonEliminarLocalStorage = crearElementoHTML("button", {
+        id: "botonEliminarLocalStorage",
+        class: "botonEliminarLocalStorage",
+        style: "display: none; margin-left: 45%"
+    }, "Eliminar localStorage");
+    botonEliminarLocalStorage.onclick = eliminarLocalStorage;
+    document.body.appendChild(botonEliminarLocalStorage);
 
     console.log("Página cargada y carrito actualizado.");
 });

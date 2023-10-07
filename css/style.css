@@ -74,6 +74,33 @@ select {
     color: #fff;
 }
 
+label[for="checkboxDebug"] {
+    display: block;
+    margin-top: 5%;
+    margin-left: 45%;
+    color: #ffffffc5;
+}
+
+#checkboxDebug {
+    margin-left: 45%;
+}
+
+#botonEliminarLocalStorage {
+    background-color: #D32F2F;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: none;
+    margin-top: 10px;
+}
+
+#modoDebugger {
+    margin-top: 10px;
+    color: #fff;
+}
+
 button {
     background-color: #1976D2;
     color: #fff;
