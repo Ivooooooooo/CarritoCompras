@@ -2,6 +2,9 @@ const elementos = {
     botonAgregarMonitor: document.getElementById("agregarMonitor"),
     botonAgregarCelular: document.getElementById("agregarCelular"),
     botonAgregarLaptop: document.getElementById("agregarLaptop"),
+    botonAplicarDescuento: document.getElementById("aplicarDescuento"),
+    cuotasSelector: document.getElementById("cuotasSelector"),
+    botonPagar: document.getElementById("botonPagar"),
     detallesProducto: document.getElementById("detallesProducto"),
     nombreProducto: document.getElementById("nombreProducto"),
     precioProducto: document.getElementById("precioProducto"),
@@ -303,6 +306,9 @@ const actualizarCarrito = () => {
 elementos.botonAgregarMonitor.addEventListener("click", () => agregarProductoAlCarrito('Monitor', 200, 'Monitor de 19 pulgadas, ideal para tareas de oficina.'));
 elementos.botonAgregarCelular.addEventListener("click", () => agregarProductoAlCarrito('Celular', 500, 'Teléfono celular de última generación con cámara de alta resolución.'));
 elementos.botonAgregarLaptop.addEventListener("click", () => agregarProductoAlCarrito('Laptop', 800, 'Laptop potente para juegos con pantalla Full HD.'));
+elementos.botonAplicarDescuento.addEventListener("click", () => aplicarDescuento());
+
+elementos.botonPagar.addEventListener("click", () => mostrarAlerta());
 
 const activarBotonEliminarLocalStorage = (mostrar) => {
     const botonEliminarLocalStorage = document.getElementById("botonEliminarLocalStorage");

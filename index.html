@@ -40,7 +40,7 @@
 
     <label class="sepIzq sepAb" for="codigoDescuento">Código de Descuento:</label>
     <input class="sepIzq sepAb" type="text" id="codigoDescuento" placeholder="Ingresa tu código">
-    <button class="sepIzq sepAb" onclick="aplicarDescuento()">Aplicar</button>
+    <button class="sepIzq sepAb" id="aplicarDescuento">Aplicar</button>
 
     <label class="sepIzq sepAb" for="cuotas">Número de Cuotas:</label>
     <select class="sepIzq sepAb" id="cuotas" onchange="calcularCuotas()">
@@ -57,7 +57,7 @@
         <p class="total">Total: $<span id="totalCuotas">0</span></p>
     </div>
 
-    <button class="sepIzq sepAb" id="botonPagar" onclick="mostrarAlerta()">PAGAR</button>
+    <button class="sepIzq sepAb" id="botonPagar">PAGAR</button>
 
     <script src="./js/main.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
