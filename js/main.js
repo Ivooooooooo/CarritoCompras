@@ -324,11 +324,10 @@ const boolModoDebug = () => {
 
 const eliminarLocalStorage = () => {
     localStorage.clear();
+    carrito.length = 0;
+    total = 0;
+    actualizarCarrito();
     mostrarMensaje("LocalStorage limpiado correctamente.", "success");
-
-    setTimeout(() => {
-        location.reload();
-    }, 1500);
 };
 
 document.addEventListener("DOMContentLoaded", () => {
