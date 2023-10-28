@@ -16,9 +16,41 @@ const elementos = {
     totalElement: document.getElementById("total"),
     costoCuotaElement: document.getElementById("costoCuota"),
     totalCuotasElement: document.getElementById("totalCuotas"),
+    totalDolarElement: document.getElementById("totalDolar"),
 };
 
 const carrito = [];
+
+const productos = {
+    1: {
+        nombre: "Monitor",
+        precio: 200,
+        descripcion: "Monitor de 19 pulgadas, ideal para tareas de oficina.",
+        /* No implementado
+        imagen: "./images/monitor.png",
+        descuento: false 
+        */
+    },
+    2: {
+        nombre: "Celular",
+        precio: 500,
+        descripcion: "Teléfono celular de última generación con cámara de alta resolución.",
+        /* No implementado
+        imagen: "./images/celular.png",
+        descuento: false 
+        */
+    },
+    3: {
+        nombre: "Laptop",
+        precio: 800,
+        descripcion: "Laptop potente para juegos con pantalla Full HD.",
+        /* No implementado
+        imagen: "./images/laptop.png",
+        descuento: false 
+        */
+    },
+};
+
 const productosAgregados = {};
 const cantidadPorProducto = {};
 let total = 0;
@@ -109,7 +141,19 @@ const verificarLimitePorTipo = (nombre) => {
     return cantidadEnCarrito < 3;
 };
 
-const agregarProductoAlCarrito = (nombre, precio, descripcion) => {
+const agregarProductoAlCarrito = (id) => {
+    const producto = productos[id];
+    if (!producto) {
+        mostrarMensaje(`Producto con ID ${id} no encontrado.`, "error");
+        return;
+    }
+
+    const {
+        nombre,
+        precio,
+        descripcion
+    } = producto;
+
     if (verificarLimitePorTipo(nombre)) {
         if (limitePorProducto[nombre] === undefined || limitePorProducto[nombre] < 3) {
             const productoExistente = carrito.find((producto) => producto.nombre === nombre);
@@ -178,9 +222,20 @@ const filtrarProductosConDescuento = () => {
 const calcularTotalEnCuotas = () => {
     const cuotas = cuotasSeleccionadas;
     const totalEnCuotas = calcularTotalConInteres(total, cuotas);
-    elementos.totalElement.textContent = total.toFixed(2);
-    elementos.costoCuotaElement.textContent = (totalEnCuotas / cuotas).toFixed(2);
-    elementos.totalCuotasElement.textContent = totalEnCuotas.toFixed(2);
+
+    obtenerValorDolar("Blue")
+        .then(valorDolar => {
+            if (valorDolar !== null) {
+                const totalEnDolares = total / valorDolar;
+
+                elementos.totalElement.textContent = total.toFixed(2);
+                elementos.costoCuotaElement.textContent = (totalEnCuotas / cuotas).toFixed(2);
+                elementos.totalCuotasElement.textContent = totalEnCuotas.toFixed(2);
+                elementos.totalDolarElement.textContent = totalEnDolares.toFixed(2);
+            } else {
+                mostrarMensaje("Error al obtener el valor del dólar blue.", "error");
+            }
+        });
 };
 
 const calcularCuotas = () => {
@@ -205,6 +260,46 @@ const calcularTotalConInteres = (capitalInicial, periodos) => {
 const calcularTasaInteres = (periodos) => {
     return tasaInteresInicial + (periodos - 1) * ((tasaInteresFinal - tasaInteresInicial) / 4);
 };
+
+function obtenerValorDolar(tipoDolar) {
+    const url = 'https://api.bluelytics.com.ar/v2/latest';
+
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error al obtener los datos del dólar');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                switch (tipoDolar) {
+                    case "Blue":
+                        if (data.blue && data.blue.value_avg) {
+                            return data.blue.value_avg;
+                        } else {
+                            console.error('No se encontró el valor del dólar blue');
+                        }
+                        break;
+                    case "Oficial":
+                        if (data.oficial && data.oficial.value_avg) {
+                            return data.oficial.value_avg;
+                        } else {
+                            console.error('No se encontró el valor del dólar oficial');
+                        }
+                        break;
+                    default:
+                        console.error('Tipo de dólar no válido');
+                }
+            } else {
+                console.error('No se encontraron datos del dólar');
+            }
+        })
+        .catch(error => {
+            console.error('Error al obtener los datos del dólar:', error);
+            return null;
+        });
+}
 
 const aplicarDescuento = () => {
     if (descuentoAplicado) {
@@ -303,9 +398,9 @@ const actualizarCarrito = () => {
     console.log("Carrito actualizado:", carrito, "Total:", total);
 };
 
-elementos.botonAgregarMonitor.addEventListener("click", () => agregarProductoAlCarrito('Monitor', 200, 'Monitor de 19 pulgadas, ideal para tareas de oficina.'));
-elementos.botonAgregarCelular.addEventListener("click", () => agregarProductoAlCarrito('Celular', 500, 'Teléfono celular de última generación con cámara de alta resolución.'));
-elementos.botonAgregarLaptop.addEventListener("click", () => agregarProductoAlCarrito('Laptop', 800, 'Laptop potente para juegos con pantalla Full HD.'));
+elementos.botonAgregarMonitor.addEventListener("click", () => agregarProductoAlCarrito(1));
+elementos.botonAgregarCelular.addEventListener("click", () => agregarProductoAlCarrito(2));
+elementos.botonAgregarLaptop.addEventListener("click", () => agregarProductoAlCarrito(3));
 elementos.botonAplicarDescuento.addEventListener("click", () => aplicarDescuento());
 
 elementos.botonPagar.addEventListener("click", () => mostrarAlerta());
